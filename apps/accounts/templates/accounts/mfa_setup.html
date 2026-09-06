@@ -1,0 +1,25 @@
+{% extends "layouts/account.html" %}
+{% load project_i18n %}
+{% block title %}{% t "accounts.mfa.setup.submit" %} {% t "accounts.mfa.verify.page_title" %}{% endblock %}
+{% block body_class %}auth-minimal-page{% endblock %}
+{% block content %}
+<section class="auth-minimal-shell" aria-labelledby="mfa-setup-title">
+  <div class="auth-minimal-card">
+    <div class="auth-minimal-heading">
+      <h1 id="mfa-setup-title">{% t "accounts.mfa.security.enable" %}</h1>
+      <p>{% t "accounts.mfa.setup.help" %}</p>
+    </div>
+    <div class="mfa-setup-panel">
+      <img class="mfa-qr" src="{{ qr_data_uri }}" alt="{% t "accounts.mfa.setup.qr_alt" %}">
+      <p>{% t "accounts.mfa.setup.manual_help" %}</p>
+      <code class="mfa-secret" dir="ltr">{{ manual_secret }}</code>
+    </div>
+    {% if rate_limited %}<div class="form-alert" role="alert">{% t "common.rate_limited" %}</div>{% endif %}
+    <form method="post" class="account-form auth-minimal-form" novalidate>
+      {% csrf_token %}
+      <label class="auth-minimal-field"><span>{{ form.code.label }}</span>{{ form.code }}{% if form.code.errors %}<small class="form-error">{{ form.code.errors|striptags }}</small>{% endif %}</label>
+      <button type="submit" class="account-submit auth-minimal-submit">{% t "accounts.mfa.setup.submit" %}</button>
+    </form>
+  </div>
+</section>
+{% endblock %}

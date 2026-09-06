@@ -1,0 +1,142 @@
+{% load static project_i18n %}
+
+<!DOCTYPE html>
+
+<html lang="fa" dir="rtl"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <meta name="theme-color" content="#124a37">
+
+<title>
+    {% block title %}
+        {% t "navigation.account" %} | {% t "app.name" %}
+    {% endblock %}
+</title>
+
+
+<script type="module" src="{% static 'js/feather-lite.js' %}"></script>
+<script type="module" src="{% static 'js/persian-ui.js' %}"></script>
+<script type="module" src="{% static 'js/notifications-popover.js' %}"></script>
+
+<link rel="stylesheet" href="{% static 'css/utilities.css' %}">
+<link rel="stylesheet" href="{% static 'css/library.css' %}">
+
+{% block extra_css %}{% endblock %}
+
+</head>
+
+<body class="account-body account-shell {% block body_class %}{% endblock %}" data-site-translations-url="{% url 'ui_translations' 'site' %}" > <header class="account-shell-header"> <div class="site-container account-shell-header-inner">
+
+        <a
+            href="{% if user.is_authenticated %}/library/{% else %}/{% endif %}"
+            class="account-brand"
+            aria-label="{% t 'app.name' %}"
+        >
+            <i class="account-brand-mark" data-feather="book-open" aria-hidden="true"></i>
+            <span>
+                <strong>{% t "app.name" %}</strong>
+            </span>
+        </a>
+
+        {% if user.is_authenticated %}
+            <nav
+                class="account-nav"
+                aria-label="{% t 'navigation.account_menu' %}"
+            >
+                <a href="{% url 'index' %}" class="account-back">
+                    <i data-feather="book-open"></i>
+                    <span>{% t "navigation.library" %}</span>
+                </a>
+
+                {% include 'components/notification-popover.html' with notification_button_class='account-bell' %}
+
+                <a
+                    href="{% url 'accounts:profile' %}"
+                    class="account-user"
+                >
+                    {% if user.profile.avatar %}
+                        <img src="{{ user.profile.avatar.url }}" alt="">
+                    {% else %}
+                        <span>{{ user.username|slice:':1'|upper }}</span>
+                    {% endif %}
+
+                    <strong>
+                        {{ user.get_full_name|default:user.username|truncatechars:18 }}
+                    </strong>
+                </a>
+
+                <form
+                    method="post"
+                    action="{% url 'accounts:logout' %}"
+                    class="account-logout"
+                >
+                    {% csrf_token %}
+
+                    <button
+                        type="submit"
+                        aria-label="{% t 'common.actions.logout' %}"
+                        title="{% t 'common.actions.logout' %}"
+                    >
+                        <i data-feather="log-out"></i>
+                    </button>
+                </form>
+            </nav>
+
+        {% else %}
+            {% block account_guest_back %}
+                <a href="/" class="account-back">
+                    <i data-feather="arrow-right"></i>
+                    <span>{% t "navigation.home" %}</span>
+                </a>
+            {% endblock %}
+        {% endif %}
+
+    </div>
+</header>
+
+<main class="account-main account-shell-main">
+
+    {% if messages %}
+        <div class="account-panel mb-5">
+            {% for message in messages %}
+                <div
+                    class="{% if message.tags == 'error' %}form-alert{% else %}p-3 border border-emerald-200 bg-emerald-50 text-emerald-800 rounded-xl text-sm{% endif %}"
+                    role="alert"
+                >
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+
+</main>
+
+<footer class="account-footer account-shell-footer">
+    <div class="site-container">
+
+        <span>
+            {% t "app.footer_note" %}
+        </span>
+
+        <nav>
+
+            {% if user.is_authenticated %}
+                <a href="{% url 'index' %}?contact=1">
+                    {% t "navigation.contact" %}
+                </a>
+            {% endif %}
+
+            {% block account_footer_library_link %}
+                <a href="{% url 'index' %}">
+                    {% t "common.actions.back_to_library" %}
+                </a>
+            {% endblock %}
+        </nav>
+
+    </div>
+</footer>
+
+<script type="module" src="{% static 'js/site.js' %}"></script>
+
+{% block extra_js %}{% endblock %}
+</body>
+</html>

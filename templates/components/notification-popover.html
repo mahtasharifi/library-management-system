@@ -1,0 +1,31 @@
+{% load project_i18n %}
+<div class="notification-popover-host"
+     data-notification-host
+     data-notification-endpoint="{% url 'accounts:notifications_recent' %}">
+    <button type="button"
+            class="{{ notification_button_class }}"
+            data-notification-toggle
+            aria-expanded="false"
+            aria-controls="notificationPopoverV8"
+            aria-label="{% t 'notifications.open_recent' %}"
+            title="{% t 'notifications.title' %}">
+        <i data-feather="bell"></i>
+        {% if unread_notifications %}<b>{{ unread_notifications }}</b>{% endif %}
+    </button>
+
+    <section id="notificationPopoverV8"
+             class="notification-popover-panel hidden"
+             data-notification-popover
+             aria-label="{% t 'notifications.recent' %}">
+        <header>
+            <div><strong>{% t "notifications.recent" %}</strong><small>{% t "notifications.last_five" %}</small></div>
+            <button type="button" data-notification-close aria-label="{% t 'notifications.close' %}"><i data-feather="x"></i></button>
+        </header>
+        <div class="notification-popover-list" data-notification-list>
+            <div class="notification-popover-loading"><span></span>{% t "notifications.loading" %}</div>
+        </div>
+        <footer>
+            <a href="{% url 'accounts:notifications' %}">{% t "notifications.view_all" %}<i data-feather="arrow-left"></i></a>
+        </footer>
+    </section>
+</div>

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 560" role="img" aria-labelledby="title description">
+  <title id="title">جلد کتاب</title>
+  <desc id="description">تصویر جایگزین ساده برای کتاب بدون جلد</desc>
+  <defs>
+    <linearGradient id="paper" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#eef4ef"/>
+      <stop offset="1" stop-color="#dce9e0"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="560" rx="22" fill="url(#paper)"/>
+  <circle cx="320" cy="92" r="92" fill="#e7bd46" opacity=".28"/>
+  <circle cx="55" cy="505" r="120" fill="#175b43" opacity=".08"/>
+  <rect x="90" y="116" width="220" height="310" rx="16" fill="#ffffff" stroke="#b9cfc1" stroke-width="5"/>
+  <path d="M200 156c-30-20-67-25-98-12v212c31-13 68-8 98 12V156Zm0 0c30-20 67-25 98-12v212c-31-13-68-8-98 12V156Z" fill="#175b43"/>
+  <path d="M200 156v212" stroke="#f1cb5a" stroke-width="8"/>
+  <path d="M126 206h48M126 238h48M226 206h48M226 238h48" stroke="#fff" stroke-linecap="round" stroke-width="9" opacity=".7"/>
+  <rect x="124" y="464" width="152" height="11" rx="5.5" fill="#175b43" opacity=".28"/>
+  <rect x="151" y="490" width="98" height="9" rx="4.5" fill="#175b43" opacity=".15"/>
+</svg>

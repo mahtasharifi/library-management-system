@@ -1,0 +1,130 @@
+{% extends "layouts/account.html" %}
+{% load project_i18n %}
+
+{% block title %}
+{% t "accounts.login.page_title" %}
+{% endblock %}
+
+{% block body_class %}
+login-page auth-minimal-page
+{% endblock %}
+
+{% block account_guest_back %}{% endblock %}
+
+{% block account_footer_library_link %}{% endblock %}
+
+{% block content %}
+
+<section class="auth-minimal" aria-labelledby="login-title" > <div class="auth-minimal-card">
+
+    <header class="auth-minimal-header">
+        <h1 id="login-title">
+            {% t "accounts.login.title" %}
+        </h1>
+    </header>
+
+    <form
+        method="post"
+        class="library-form auth-minimal-form"
+        novalidate
+    >
+        {% csrf_token %}
+
+        <div class="field">
+            <label for="id_username">
+                {% t "common.labels.username" %}
+            </label>
+
+            <input
+                type="text"
+                name="username"
+                id="id_username"
+                value="{{ form.username.value|default:'' }}"
+                autocomplete="username"
+                placeholder="{% t 'common.labels.username' %}"
+                autofocus
+                required
+            >
+
+            {% if form.username.errors %}
+                <p class="field-error">
+                    {{ form.username.errors|join:", " }}
+                </p>
+            {% endif %}
+        </div>
+
+        <div class="field">
+            <label for="id_password">
+                {% t "common.labels.password" %}
+            </label>
+
+            <div class="relative">
+                <input
+                    type="password"
+                    name="password"
+                    id="id_password"
+                    class="pl-12"
+                    autocomplete="current-password"
+                    placeholder="{% t 'common.labels.password' %}"
+                    required
+                >
+
+                <button
+                    type="button"
+                    data-password-toggle="id_password"
+                    class="auth-password-toggle"
+                    aria-label="{% t 'accounts.login.password_toggle' %}"
+                    aria-pressed="false"
+                >
+                    <i data-feather="eye"></i>
+                </button>
+            </div>
+
+            {% if form.password.errors %}
+                <p class="field-error">
+                    {{ form.password.errors|join:", " }}
+                </p>
+            {% endif %}
+        </div>
+
+        <label
+            class="check-row auth-remember"
+            for="id_remember_me"
+        >
+            <input
+                type="checkbox"
+                name="remember_me"
+                id="id_remember_me"
+                checked
+            >
+
+            {% t "accounts.login.remember_me" %}
+        </label>
+
+        {% if form.non_field_errors %}
+            <div class="form-alert" role="alert">
+                {% for error in form.non_field_errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <button
+            type="submit"
+            class="btn-brand auth-submit auth-primary-submit"
+        >
+            {% t "accounts.login.submit" %}
+        </button>
+    </form>
+
+    <p class="auth-switch auth-account-switch">
+        {% t "accounts.login.no_account" %}
+
+        <a href="{% url 'accounts:signup' %}">
+            {% t "accounts.login.signup" %}
+        </a>
+    </p>
+
+</div>
+
+</section> {% endblock %}

@@ -1,0 +1,134 @@
+{% extends "layouts/library.html" %}
+{% load project_i18n %}
+
+{% block title %}{% t "books.catalog.page_title" %}{% endblock %}
+{% block page_name %}catalog{% endblock %}
+{% block nav_books %}active{% endblock %}
+
+{% block content %}
+<section class="catalog-hero catalog-hero-bookshelf">
+    <div class="site-container">
+        <div class="catalog-hero-copy">
+            <h1>{% t "books.catalog.title" %}</h1>
+            <p>{% t "books.catalog.subtitle" %}</p>
+        </div>
+        <form class="catalog-search catalog-search-bookshelf" action="{% url 'book_catalog' %}" method="get" role="search">
+            <i data-feather="search"></i>
+            <input id="catalogSearchInput" name="q" value="{{ search_query }}" type="search" autocomplete="off" placeholder="{% t 'books.catalog.search_placeholder' %}" aria-label="{% t 'books.catalog.search_aria' %}">
+            <button type="submit">{% t "books.catalog.search" %}</button>
+            {% if search_query or selected_category or availability %}
+                <a id="catalogClearSearch" class="catalog-clear-search" href="{% url 'book_catalog' %}">{% t "common.actions.clear" %}</a>
+            {% endif %}
+        </form>
+    </div>
+</section>
+
+<section class="site-container catalog-layout">
+    <aside id="categories" class="catalog-sidebar">
+        <div class="catalog-sidebar-title">
+            <div><span>{% t "books.catalog.browse_topics" %}</span><strong>{% t "navigation.categories" %}</strong></div>
+            <button id="closeCatalogFilters" type="button" aria-label="{% t 'common.actions.close' %}"><i data-feather="x"></i></button>
+        </div>
+        <a class="catalog-all-category{% if not selected_category %} active{% endif %}" href="{% url 'book_catalog' %}">
+            <i data-feather="layers"></i><span>{% t "navigation.all_books" %}</span>
+        </a>
+        <div class="catalog-category-tree">
+            {% for category in categories %}
+                <div class="catalog-category-branch">
+                    <a href="{% url 'book_catalog' %}?category={{ category.id }}" style="--category-level:{{ category.depth }}"{% if selected_category.id == category.id %} class="active" aria-current="page"{% endif %}>
+                        <span>{{ category.name }}</span><b>{{ category.book_count }}</b>
+                    </a>
+                </div>
+            {% empty %}
+                <p class="catalog-no-category">{% t "books.catalog.categories_empty" %}</p>
+            {% endfor %}
+        </div>
+    </aside>
+
+    <div class="catalog-results">
+        <div class="catalog-toolbar">
+            <div>
+                <button id="openCatalogFilters" type="button" class="catalog-filter-toggle"><i data-feather="sliders"></i>{% t "navigation.categories" %}</button>
+                <nav id="catalogBreadcrumbV3" aria-label="{% t 'books.catalog.category_path_aria' %}">
+                    <a href="{% url 'book_catalog' %}">{% t "navigation.all_books" %}</a>
+                    {% if selected_category %}<i data-feather="chevron-left"></i><span>{{ selected_category.name }}</span>{% endif %}
+                </nav>
+            </div>
+            <div class="catalog-toolbar-actions catalog-toolbar-bookshelf">
+                <form class="catalog-availability-filter" action="{% url 'book_catalog' %}" method="get">
+                    {% if search_query %}<input type="hidden" name="q" value="{{ search_query }}">{% endif %}
+                    {% if selected_category %}<input type="hidden" name="category" value="{{ selected_category.id }}">{% endif %}
+                    <label for="catalogAvailabilityFilter">{% t "common.labels.status" %}</label>
+                    <select id="catalogAvailabilityFilter" name="availability" aria-label="{% t 'books.catalog.filter_status_aria' %}">
+                        <option value=""{% if not availability %} selected{% endif %}>{% t "navigation.all_books" %}</option>
+                        <option value="available"{% if availability == 'available' %} selected{% endif %}>{% t "common.status.available" %}</option>
+                        <option value="borrowed"{% if availability == 'borrowed' %} selected{% endif %}>{% t "common.status.borrowed" %}</option>
+                    </select>
+                    <button type="submit">{% t "common.actions.apply" %}</button>
+                </form>
+            </div>
+        </div>
+
+        {% if search_query or selected_category or availability %}
+            <div id="catalogActiveFilter" class="catalog-active-filter">
+                {% if search_query %}<span>{% t "books.catalog.search_summary" query=search_query %}</span>{% endif %}
+                {% if selected_category %}<span>{% t "books.catalog.category_summary" category=selected_category.name %}</span>{% endif %}
+                {% if availability %}<span>{% if availability == 'available' %}{% t "books.catalog.status_summary_available" %}{% else %}{% t "books.catalog.status_summary_borrowed" %}{% endif %}</span>{% endif %}
+                <a href="{% url 'book_catalog' %}" aria-label="{% t 'books.catalog.filters_clear_aria' %}"><i data-feather="x"></i>{% t "books.catalog.filters_clear" %}</a>
+            </div>
+        {% endif %}
+
+        <div class="catalog-shelf-caption catalog-shelf-caption-minimal" aria-label="{% t 'books.catalog.status_guide_aria' %}">
+            <div class="catalog-shelf-legend"><span><i class="available"></i>{% t "common.status.available" %}</span><span><i class="borrowed"></i>{% t "common.status.borrowed" %}</span><span><i class="digital"></i>{% t "books.catalog.digital" %}</span></div>
+        </div>
+
+        {% if books %}
+            <div id="catalogBookGrid" class="catalog-bookshelf-grid library-bookshelf real-library-bookshelf" aria-label="{% t 'books.catalog.shelf_aria' %}">
+                <div class="real-library-casework" aria-hidden="true">
+                    <span class="real-library-frame real-library-frame--top"></span>
+                    <span class="real-library-frame real-library-frame--right"></span>
+                    <span class="real-library-frame real-library-frame--bottom"></span>
+                    <span class="real-library-frame real-library-frame--left"></span>
+                    <span class="real-library-shelf-board real-library-shelf-board--middle"></span>
+                    <span class="real-library-shelf-board real-library-shelf-board--floor"></span>
+                </div>
+                {% for book in books %}
+                    <div class="shelf-slot" data-shelf-book-id="{{ book.id }}">
+                        <a class="catalog-shelf-book {{ book.shelf_color_class }} {{ book.shelf_size_class }}"
+                           href="{% url 'book_detail' book.id %}"
+                           data-book-pullout
+                           data-book-title="{{ book.title }}"
+                           {% t "common.unknown" as unknown_label %}
+                           data-book-author="{{ book.author|default:unknown_label }}"
+                           {% t "books.detail.no_category" as no_category_label %}
+                           data-book-category="{{ book.display_category_name|default:no_category_label }}"
+                           data-book-status="{{ book.availability_label }}"
+                           data-book-status-class="{{ book.availability_class }}"
+                           aria-label="{% t 'books.catalog.open_book_aria' title=book.title %}">
+                            <span class="shelf-book-page-block" aria-hidden="true"></span>
+                            <span class="shelf-book-top-edge" aria-hidden="true"></span>
+                            <span class="catalog-shelf-spine">
+                                <span class="shelf-book-band shelf-book-band--top" aria-hidden="true"></span>
+                                <span class="catalog-shelf-title" dir="rtl">{{ book.title }}</span>
+                                <span class="shelf-book-band shelf-book-band--bottom" aria-hidden="true"></span>
+                                <span class="catalog-shelf-mark" aria-hidden="true"></span>
+                            </span>
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+            <p id="bookTransitionStatus" class="library-sr-only" role="status" aria-live="polite"></p>
+        {% else %}
+            <div id="catalogEmptyV3" class="library-empty catalog-empty">
+                <i data-feather="book-open"></i>
+                <h3>{% t "books.catalog.no_results" %}</h3>
+                <p>{% t "books.catalog.no_results_help" %}</p>
+                <a href="{% url 'book_catalog' %}">{% t "books.catalog.show_all" %}</a>
+            </div>
+        {% endif %}
+
+        <nav id="catalogPagination" class="catalog-pagination" aria-label="{% t 'books.catalog.pagination_aria' %}" hidden></nav>
+    </div>
+</section>
+<div id="catalogSidebarBackdrop" class="catalog-sidebar-backdrop"></div>
+{% endblock %}

@@ -1,0 +1,48 @@
+{% load static project_i18n %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% t "admin.upload.page_title" %}</title>
+    <script type="module" src="{% static 'js/feather-lite.js' %}"></script>
+    <script type="module" src="{% static 'js/persian-ui.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/utilities.css' %}">
+    <link rel="stylesheet" href="{% static 'css/library.css' %}">
+    <link rel="stylesheet" href="{% static 'books/css/admin-upload.css' %}">
+</head>
+<body class="upload-page" data-upload-url="{% url 'api_upload' %}" data-translations-url="{% url 'ui_translations' 'upload' %}">
+{% csrf_token %}
+<main class="asset-shell upload-shell">
+    <header class="asset-hero">
+        <a href="{% url 'dashboard' %}" class="inline-flex items-center gap-2 text-xs text-white/70 mb-4"><i data-feather="arrow-right" class="w-4 h-4"></i>{% t "common.actions.back_to_admin" %}</a>
+        <h1 class="text-2xl font-black">{% t "admin.upload.title" %}</h1>
+        <p class="text-sm text-white/70 mt-2 leading-7">{% t "admin.upload.help" %}</p>
+    </header>
+    <section class="asset-body">
+        <div class="asset-tabs">
+            <button class="asset-tab active" data-type="cover"><i data-feather="image" class="w-4 h-4 inline ml-1"></i>{% t "admin.upload.cover" %}</button>
+            <button class="asset-tab" data-type="pdf"><i data-feather="file-text" class="w-4 h-4 inline ml-1"></i>{% t "admin.upload.pdf" %}</button>
+        </div>
+        <form id="assetForm">
+            <input type="hidden" id="assetType" value="cover">
+            <label class="drop block cursor-pointer">
+                <i id="assetIcon" data-feather="image" class="w-12 h-12 mx-auto text-emerald-700"></i>
+                <strong id="assetTitle" class="block mt-3">{% t "admin.upload.choose_covers" %}</strong>
+                <span id="assetHint" class="block text-xs text-gray-500 mt-2">{% t "admin.upload.cover_hint" %}</span>
+                <input id="files" type="file" accept="image/*" multiple required>
+                <small id="selectedFiles" class="selected-files">{% t "admin.upload.none_selected" %}</small>
+            </label>
+            <div class="flex justify-end mt-4"><button class="btn-brand" type="submit"><i data-feather="upload-cloud" class="w-4 h-4"></i>{% t "admin.upload.submit" %}</button></div>
+        </form>
+        <div id="progress" class="hidden text-center py-8"><div class="loader mx-auto"></div><p class="text-sm text-gray-500 mt-3">{% t "admin.upload.progress" %}</p></div>
+        <section id="results" class="hidden mt-7">
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-3"><h2 class="font-black">{% t "admin.upload.links_title" %}</h2><div class="flex gap-2"><button id="copyAll" class="btn-soft"><i data-feather="copy" class="w-4 h-4"></i>{% t "common.actions.copy_all" %}</button><button id="downloadCsv" class="btn-soft"><i data-feather="download" class="w-4 h-4"></i>{% t "common.actions.download_csv" %}</button></div></div>
+            <div id="resultList" class="grid gap-2"></div>
+        </section>
+        <div id="error" class="hidden mt-4 p-4 rounded-xl bg-red-50 text-red-700 text-sm"></div>
+    </section>
+</main>
+<script type="module" src="{% static 'books/js/admin-upload.js' %}"></script>
+</body>
+</html>

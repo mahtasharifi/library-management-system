@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.lock -r requirements-dev.txt
+
+      - name: Django checks
+        run: python manage.py check --settings=config.settings.test
+
+      - name: Test suite
+        run: python manage.py test --settings=config.settings.test
+
+      - name: Ruff
+        run: ruff check .
+
+      - name: Bandit
+        run: bandit -r apps common config -x '*/migrations/*,*/tests.py' -ll
+
+      - name: Dependency audit
+        run: pip-audit -r requirements.lock
+
+  docker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: docker build --tag library:ci .

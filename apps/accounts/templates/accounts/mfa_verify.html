@@ -1,0 +1,20 @@
+{% extends "layouts/account.html" %}
+{% load project_i18n %}
+{% block title %}{% t "accounts.mfa.verify.page_title" %}{% endblock %}
+{% block body_class %}auth-minimal-page{% endblock %}
+{% block content %}
+<section class="auth-minimal-shell" aria-labelledby="mfa-title">
+  <div class="auth-minimal-card">
+    <div class="auth-minimal-heading">
+      <h1 id="mfa-title">{% t "accounts.mfa.verify.title" %}</h1>
+      <p>{% t "accounts.mfa.verify.help" %}</p>
+    </div>
+    {% if rate_limited %}<div class="form-alert" role="alert">{% t "common.rate_limited" %}</div>{% endif %}
+    <form method="post" class="account-form auth-minimal-form" novalidate>
+      {% csrf_token %}
+      <label class="auth-minimal-field"><span>{{ form.code.label }}</span>{{ form.code }}{% if form.code.errors %}<small class="form-error">{{ form.code.errors|striptags }}</small>{% endif %}</label>
+      <button type="submit" class="account-submit auth-minimal-submit">{% t "accounts.mfa.verify.submit" %}</button>
+    </form>
+  </div>
+</section>
+{% endblock %}

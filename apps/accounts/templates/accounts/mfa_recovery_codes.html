@@ -1,0 +1,15 @@
+{% extends "layouts/account.html" %}
+{% load project_i18n %}
+{% block title %}{% t "accounts.mfa.recovery.page_title" %}{% endblock %}
+{% block content %}
+<section class="profile-card mfa-security-card" aria-labelledby="recovery-title">
+  <div>
+    <h1 id="recovery-title">{% t "accounts.mfa.recovery.title" %}</h1>
+    <p>{% t "accounts.mfa.recovery.help" %}</p>
+  </div>
+  <ul class="mfa-recovery-list" dir="ltr">
+    {% for code in recovery_codes %}<li><code>{{ code }}</code></li>{% endfor %}
+  </ul>
+  <a class="btn-brand" href="{% url 'accounts:profile' %}">{% t "accounts.mfa.recovery.done" %}</a>
+</section>
+{% endblock %}

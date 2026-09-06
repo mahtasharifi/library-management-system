@@ -1,0 +1,91 @@
+{% load project_i18n %}
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="color-scheme" content="light">
+    <meta name="supported-color-schemes" content="light">
+    <title>{{ subject }}</title>
+</head>
+<body style="margin:0;padding:0;background:#f2f6f4;font-family:Tahoma,Arial,sans-serif;color:#18352c;direction:rtl;text-align:right;">
+    <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">
+        {{ heading }} — {{ message }}
+    </div>
+
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%;background:#f2f6f4;border-collapse:collapse;">
+        <tr>
+            <td align="center" style="padding:32px 12px;">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%;max-width:640px;border-collapse:separate;border-spacing:0;">
+                    <tr>
+                        <td style="background:#174f3b;background-image:linear-gradient(135deg,#174f3b 0%,#247759 100%);padding:28px 30px;border-radius:22px 22px 0 0;color:#ffffff;">
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="border-collapse:collapse;">
+                                <tr>
+                                    <td valign="middle" style="padding:0;">
+                                        <div style="font-size:12px;line-height:1.8;color:#cfe7dc;margin:0 0 7px 0;letter-spacing:.1px;">{{ eyebrow }}</div>
+                                        <div style="font-size:25px;line-height:1.55;font-weight:700;color:#ffffff;margin:0;">{{ heading }}</div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="background:#ffffff;padding:30px;border-left:1px solid #dfe9e4;border-right:1px solid #dfe9e4;">
+                            <p style="margin:0;font-size:15px;line-height:2;color:#38564d;">{{ message|linebreaksbr }}</p>
+
+                            {% if details %}
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%;margin:24px 0 0 0;background:#f7faf8;border:1px solid #e3ece7;border-radius:14px;border-collapse:separate;border-spacing:0;overflow:hidden;">
+                                {% for item in details %}
+                                <tr>
+                                    <td style="padding:13px 16px;font-size:13px;line-height:1.8;color:#6a8179;width:34%;{% if not forloop.last %}border-bottom:1px solid #e7efeb;{% endif %}">{{ item.label }}</td>
+                                    <td style="padding:13px 16px;font-size:14px;line-height:1.8;font-weight:700;color:#1c4437;{% if not forloop.last %}border-bottom:1px solid #e7efeb;{% endif %}">{{ item.value }}</td>
+                                </tr>
+                                {% endfor %}
+                            </table>
+                            {% endif %}
+
+                            {% if action_url and action_label %}
+                            <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin:26px 0 0 auto;border-collapse:separate;">
+                                <tr>
+                                    <td bgcolor="#1f7656" style="border-radius:12px;background:#1f7656;">
+                                        <a href="{{ action_url }}" style="display:inline-block;padding:13px 24px;font-size:14px;line-height:1.6;font-weight:700;color:#ffffff;text-decoration:none;border-radius:12px;">{{ action_label }}</a>
+                                    </td>
+                                </tr>
+                            </table>
+                            <p style="margin:18px 0 0 0;font-size:11px;line-height:1.9;color:#8ba097;word-break:break-all;">
+                                اگر دکمه باز نشد، این نشانی را در مرورگر باز کنید:<br>
+                                <a href="{{ action_url }}" style="color:#2b7159;text-decoration:underline;">{{ action_url }}</a>
+                            </p>
+                            {% endif %}
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="background:#edf4f0;padding:20px 30px;border:1px solid #dfe9e4;border-top:0;border-radius:0 0 22px 22px;">
+                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="border-collapse:collapse;">
+                                <tr>
+                                    <td style="font-size:11px;line-height:1.9;color:#789087;">
+                                        {% t "email.auto_generated" %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding-top:9px;font-size:12px;line-height:1.8;color:#45655a;">
+                                        <a href="{{ library_url }}" style="color:#1f6f52;text-decoration:none;font-weight:700;">{% t "email.enter_library" %}</a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="padding:16px 8px 0 8px;text-align:center;font-size:10px;line-height:1.8;color:#9aaca5;">
+                            {% t "app.name" %}
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
