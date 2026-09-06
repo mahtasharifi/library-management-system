@@ -1,4 +1,4 @@
-FROM python:3.13.15-slim-bookworm AS builder
+FROM python:3.14.7-slim-bookworm AS builder
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1 PIP_NO_CACHE_DIR=1
 WORKDIR /build
 RUN apt-get update \
@@ -9,7 +9,7 @@ RUN python -m venv /opt/venv \
     && /opt/venv/bin/pip install --upgrade pip \
     && /opt/venv/bin/pip install -r requirements.lock
 
-FROM python:3.13.15-slim-bookworm AS runtime
+FROM python:3.14.7-slim-bookworm AS runtime
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PATH="/opt/venv/bin:$PATH"
 WORKDIR /app
 RUN apt-get update \
