@@ -1,0 +1,82 @@
+{% extends "layouts/account.html" %}
+{% load static project_i18n %}
+
+{% block title %}{% t "accounts.profile.page_title" %}{% endblock %}
+
+{% block content %}
+<section class="profile-overview" aria-labelledby="profile-title">
+    <header class="profile-card">
+        <div class="profile-identity-card">
+            {% if profile.avatar %}
+                <img src="{{ profile.avatar.url }}" alt="{% t 'accounts.profile.avatar_alt' name=user.get_full_name|default:user.username %}">
+            {% else %}
+                <span>{{ user.username|slice:':1'|upper }}</span>
+            {% endif %}
+            <div>
+                <h1 id="profile-title">{{ user.get_full_name|default:user.username }}</h1>
+                <p class="profile-contact">
+                    {% if user.email %}<span dir="ltr">{{ user.email }}</span>{% endif %}
+                    {% if profile.phone_number %}<span dir="ltr">{{ profile.phone_number }}</span>{% endif %}
+                </p>
+                <small>{% t "accounts.profile.member_since" %} <time datetime="{{ user.date_joined|date:'c' }}" data-persian-date="date"></time></small>
+            </div>
+        </div>
+        <div class="profile-action-list">
+            <a href="{% url 'accounts:profile_edit' %}"><i data-feather="edit-3"></i>{% t "accounts.profile.edit" %}</a>
+            <a href="{% url 'accounts:change_password' %}" class="secondary"><i data-feather="lock"></i>{% t "accounts.profile.change_password" %}</a>
+        </div>
+    </header>
+
+    <div class="profile-stats" aria-label="{% t "accounts.profile.summary_aria" %}">
+        <span><i data-feather="book"></i><b>{{ physical_count }}</b> {% t "accounts.profile.physical_borrow" %}</span>
+        <span><i data-feather="file-text"></i><b>{{ digital_count }}</b> {% t "accounts.profile.pdf_request" %}</span>
+        <span><i data-feather="clock"></i><b>{{ pending_count }}</b> {% t "accounts.profile.pending_review" %}</span>
+    </div>
+
+    <section class="profile-history" aria-labelledby="profile-history-title">
+        <header>
+            <div><h2 id="profile-history-title">{% t "accounts.profile.requests_title" %}</h2><p>{% t "accounts.profile.requests_subtitle" %}</p></div>
+            <a href="{% url 'book_catalog' %}">{% t "accounts.profile.view_books" %}<i data-feather="arrow-left"></i></a>
+        </header>
+        <div class="profile-history-accordions">
+            <details class="profile-history-disclosure">
+                <summary>
+                    <span class="profile-history-icon"><i data-feather="book-open"></i></span>
+                    <span class="profile-history-summary-copy"><strong>{% t "accounts.profile.physical_borrow" %}</strong><small>{% t "accounts.profile.request_count" count=physical_count %}</small></span>
+                    <span class="profile-history-summary-action">{% t "accounts.profile.view_details" %}<i data-feather="chevron-down"></i></span>
+                </summary>
+                <div class="profile-history-list profile-history-list-collapsible">
+                    {% for item in physical_requests %}
+                        <article class="profile-history-row">
+                            <div><h3>{{ item.book.title }}</h3><time datetime="{{ item.created_at|date:'c' }}" data-persian-date="datetime"></time></div>
+                            <span class="request-status status-{{ item.status }}">{{ item.get_status_display }}</span>
+                            {% if item.admin_response %}<p>{{ item.admin_response }}</p>{% endif %}
+                        </article>
+                    {% empty %}
+                        <div class="profile-history-empty"><i data-feather="inbox"></i><span>{% t "accounts.profile.no_requests" %}</span></div>
+                    {% endfor %}
+                </div>
+            </details>
+
+            <details class="profile-history-disclosure profile-history-disclosure-pdf">
+                <summary>
+                    <span class="profile-history-icon is-pdf"><i data-feather="file-text"></i></span>
+                    <span class="profile-history-summary-copy"><strong>{% t "accounts.profile.pdf_request" %}</strong><small>{% t "accounts.profile.request_count" count=digital_count %}</small></span>
+                    <span class="profile-history-summary-action">{% t "accounts.profile.view_details" %}<i data-feather="chevron-down"></i></span>
+                </summary>
+                <div class="profile-history-list profile-history-list-collapsible">
+                    {% for item in digital_requests %}
+                        <article class="profile-history-row">
+                            <div><h3>{% if item.book %}{{ item.book.title }}{% else %}{% t "accounts.profile.requested_book" %}{% endif %}</h3><time datetime="{{ item.created_at|date:'c' }}" data-persian-date="datetime"></time></div>
+                            <span class="request-status status-{{ item.status }}">{{ item.get_status_display }}</span>
+                            {% if item.admin_response %}<p>{{ item.admin_response }}</p>{% endif %}
+                        </article>
+                    {% empty %}
+                        <div class="profile-history-empty"><i data-feather="inbox"></i><span>{% t "accounts.profile.no_requests" %}</span></div>
+                    {% endfor %}
+                </div>
+            </details>
+        </div>
+    </section>
+</section>
+{% endblock %}

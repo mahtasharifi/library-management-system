@@ -1,0 +1,53 @@
+# Environment / secrets
+.env
+.env.*
+!.env.example
+deploy/env/*.env
+!deploy/env/*.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+
+# Runtime / generated application data
+*.sqlite3
+var/
+media/
+private_media/
+staticfiles/
+artifacts/
+
+# Build / packaging
+dist/
+build/
+*.zip
+*.tar
+*.tar.gz
+
+# Backups / logs / database exports
+*.bak
+*.backup
+*.orig
+*.log
+*.sql
+
+# Editors / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

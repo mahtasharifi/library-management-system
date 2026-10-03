@@ -1,0 +1,82 @@
+services:
+  migrate:
+    build: .
+    image: library:release
+    command: >
+      sh -c "python manage.py migrate --settings=config.settings.production
+      && python manage.py collectstatic --noinput --settings=config.settings.production"
+    env_file:
+      - deploy/env/runtime.env
+      - deploy/env/migration.env
+    environment:
+      DJANGO_MIGRATION_MODE: "true"
+    volumes:
+      - staticfiles:/app/staticfiles
+      - media:/srv/library/media
+      - cdn:/srv/library/cdn
+    restart: "no"
+
+  web:
+    build: .
+    image: library:release
+    env_file:
+      - deploy/env/runtime.env
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    volumes:
+      - staticfiles:/app/staticfiles:ro
+      - media:/srv/library/media
+      - cdn:/srv/library/cdn
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import http.client,os; h=os.environ['DJANGO_ALLOWED_HOSTS'].split(',')[0].strip(); c=http.client.HTTPConnection('127.0.0.1',8000,timeout=3); c.request('GET','/live/',headers={'X-Forwarded-Proto':'https','Host':h}); r=c.getresponse(); raise SystemExit(0 if r.status==200 else 1)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+  worker:
+    image: library:release
+    command: ["python", "manage.py", "run_task_worker", "--settings=config.settings.production"]
+    env_file:
+      - deploy/env/runtime.env
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    volumes:
+      - media:/srv/library/media
+      - cdn:/srv/library/cdn
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:1.30.4-alpine
+    depends_on:
+      web:
+        condition: service_healthy
+    environment:
+      LIBRARY_DOMAIN: ${LIBRARY_DOMAIN}
+    ports:
+      - "80:8080"
+      - "443:8443"
+    volumes:
+      - ./deploy/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./deploy/nginx/library.conf.template:/etc/nginx/templates/default.conf.template:ro
+      - ${TLS_CERT_DIR}:/etc/nginx/tls:ro
+      - staticfiles:/srv/static:ro
+      - media:/srv/media:ro
+      - cdn:/srv/cdn:ro
+    restart: unless-stopped
+    user: "101:101"
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+
+volumes:
+  staticfiles:
+  media:
+  cdn:

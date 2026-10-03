@@ -1,0 +1,46 @@
+{% extends "layouts/account.html" %}
+{% load project_i18n %}
+
+{% block title %}{% t "notifications.page_title" %}{% endblock %}
+
+{% block content %}
+<section class="notifications-minimal notifications-page" aria-labelledby="notifications-title">
+    <header class="notifications-head">
+        <div>
+            <span><i data-feather="bell"></i>{% if unread_notifications %}<b>{{ unread_notifications }}</b>{% endif %}</span>
+            <div><h1 id="notifications-title">{% t "notifications.page_heading" %}</h1><p>{% t "notifications.page_subtitle" %}</p></div>
+        </div>
+        {% if unread_notifications %}
+            <form method="post" action="{% url 'accounts:notifications_read' %}">{% csrf_token %}<button type="submit"><i data-feather="check-check"></i>{% t "common.actions.read_all" %}</button></form>
+        {% endif %}
+    </header>
+
+    <nav class="notifications-filter-tabs" aria-label="{% t 'notifications.filter_aria' %}">
+        <a href="{% url 'accounts:notifications' %}" class="{% if active_filter == 'all' %}active{% endif %}">{% t "common.actions.show_all" %} <b>{{ total_notifications }}</b></a>
+        <a href="{% url 'accounts:notifications' %}?filter=unread" class="{% if active_filter == 'unread' %}active{% endif %}">{% t "notifications.unread" %} <b>{{ unread_notifications }}</b></a>
+    </nav>
+
+    <div class="notifications-list">
+        {% for item in notifications %}
+            <article class="notification-minimal {% if not item.is_read %}unread{% endif %}">
+                <span class="kind-{{ item.kind }}">
+                    {% if item.kind == 'approved' %}<i data-feather="check-circle"></i>
+                    {% elif item.kind == 'rejected' %}<i data-feather="x-circle"></i>
+                    {% elif item.kind == 'read' %}<i data-feather="eye"></i>
+                    {% elif item.kind == 'answered' %}<i data-feather="message-square"></i>
+                    {% else %}<i data-feather="bell"></i>{% endif %}
+                </span>
+                <div>
+                    <header><h2>{{ item.title }}</h2>{% if not item.is_read %}<b>{% t "notifications.new" %}</b>{% endif %}<time datetime="{{ item.created_at|date:'c' }}" data-persian-date="datetime"></time></header>
+                    <p>{{ item.message }}</p>
+                </div>
+                {% if not item.is_read %}
+                    <form method="post" action="{% url 'accounts:notification_read' item.id %}">{% csrf_token %}<button type="submit" title="{% t "notifications.mark_read_title" %}"><i data-feather="check"></i><span>{% t "common.actions.read" %}</span></button></form>
+                {% endif %}
+            </article>
+        {% empty %}
+            <div class="notifications-empty-state"><span><i data-feather="bell-off"></i></span><h2>{% if active_filter == 'unread' %}{% t "notifications.empty_unread" %}{% else %}{% t "notifications.empty" %}{% endif %}</h2><p>{% t "notifications.empty_help" %}</p><a href="{% url 'index' %}">{% t "common.actions.back_to_library" %}</a></div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

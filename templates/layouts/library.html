@@ -1,0 +1,113 @@
+{% load static project_i18n %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0f3f30">
+    <title>{% block title %}{% t "app.name" %}{% endblock %}</title>
+    <script type="module" src="{% static 'js/feather-lite.js' %}"></script>
+    <script type="module" src="{% static 'js/persian-ui.js' %}"></script>
+    <script type="module" src="{% static 'js/notifications-popover.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/utilities.css' %}">
+    <link rel="stylesheet" href="{% static 'css/library.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="library-shell"
+      data-library-page="{% block page_name %}home{% endblock %}"
+      data-catalog-url="{% url 'book_catalog' %}"
+      data-library-api-base="{% url 'api_books' %}"
+      data-home-url="{% url 'index' %}"
+      data-book-detail-url-template="{% url 'book_detail' 0 %}"
+      data-fallback-cover="{% static 'images/book-placeholder.svg' %}"
+      data-translations-url="{% url 'ui_translations' 'library' %}"
+      data-site-translations-url="{% url 'ui_translations' 'site' %}"
+      data-user-name="{{ request.user.get_full_name|default:request.user.username }}"
+      data-user-email="{{ request.user.email|default:'' }}"
+      data-user-phone="{{ request.user.profile.phone_number|default:'' }}">
+{% csrf_token %}
+
+<header class="library-header">
+    <div class="site-container library-header-inner">
+        <a href="{% url 'index' %}" class="library-brand" aria-label="{% t 'navigation.library_home_aria' %}">
+            <i class="library-brand-mark" data-feather="book-open" aria-hidden="true"></i>
+            <span><strong>{% t "app.name" %}</strong></span>
+        </a>
+
+        <button type="button" class="library-menu-toggle" data-menu-toggle aria-expanded="false" aria-label="{% t 'navigation.open_menu' %}">
+            <i data-feather="menu"></i>
+        </button>
+
+        <nav class="library-main-nav" data-site-menu aria-label="{% t 'navigation.main_menu' %}">
+            <a href="{% url 'index' %}" class="{% block nav_home %}{% endblock %}">{% t "navigation.home" %}</a>
+            <a href="{% url 'book_catalog' %}?show_categories=1#categories" class="library-categories-link">{% t "navigation.categories" %}</a>
+            <button type="button" class="library-request-nav" data-open-request>
+                <i data-feather="plus"></i>
+                {% t "books.detail.request_book" %}
+            </button>
+            <form method="post" action="{% url 'accounts:logout' %}" class="library-logout-menu">
+                {% csrf_token %}
+                <button type="submit"><i data-feather="log-out"></i>{% t "common.actions.logout" %}</button>
+            </form>
+        </nav>
+
+        <div class="library-account">
+            <button type="button" class="library-request-mobile" data-open-request aria-label="{% t 'books.detail.request_book' %}">
+                <i data-feather="plus"></i><span>{% t "books.detail.request_book" %}</span>
+            </button>
+            {% include 'components/notification-popover.html' with notification_button_class='library-notification' %}
+            <a href="{% url 'accounts:profile' %}" class="library-profile">
+                {% if user.profile.avatar %}
+                    <img src="{{ user.profile.avatar.url }}" alt="">
+                {% else %}
+                    <span>{{ user.username|slice:':1'|upper }}</span>
+                {% endif %}
+                <strong>{{ user.get_full_name|default:user.username|truncatechars:18 }}</strong>
+            </a>
+            <form method="post" action="{% url 'accounts:logout' %}" class="library-header-logout">
+                {% csrf_token %}
+                <button type="submit" aria-label="{% t 'common.actions.logout' %}" title="{% t 'common.actions.logout' %}"><i data-feather="log-out"></i></button>
+            </form>
+        </div>
+    </div>
+</header>
+
+<main class="library-main">
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="library-footer-main">
+    <div class="site-container library-footer-layout">
+        <nav class="library-footer-links" aria-label="{% t 'navigation.quick_access' %}">
+            <strong>{% t "navigation.quick_access" %}</strong>
+            <div>
+                <a href="{% url 'book_catalog' %}"><i data-feather="book-open"></i>{% t "navigation.all_books" %}</a>
+                <a href="{% url 'book_catalog' %}?show_categories=1#categories"><i data-feather="layers"></i>{% t "navigation.categories" %}</a>
+                <a href="{% url 'accounts:profile' %}"><i data-feather="user"></i>{% t "navigation.account" %}</a>
+                <a href="{% url 'accounts:notifications' %}"><i data-feather="bell"></i>{% t "navigation.notifications" %}</a>
+            </div>
+        </nav>
+        <div class="library-footer-contact">
+            <strong>{% t "navigation.contact" %}</strong>
+            <p>{% t "navigation.contact_prompt" %}</p>
+            <div>
+                <button type="button" data-open-contact><i data-feather="message-circle"></i>{% t "navigation.send_message" %}</button>
+            </div>
+        </div>
+    </div>
+    <div class="site-container library-footer-bottom-bar">
+        <span>{% t "app.footer_note" %}</span>
+        <form method="post" action="{% url 'accounts:logout' %}">{% csrf_token %}<button type="submit">{% t "common.actions.logout" %}</button></form>
+    </div>
+</footer>
+
+<div id="modalBackdrop" class="library-modal-backdrop hidden" aria-hidden="true">
+    <div id="modalContent" class="library-modal" role="dialog" aria-modal="true"></div>
+</div>
+<div id="toast" class="library-toast" role="status" aria-live="polite"></div>
+
+<script type="module" src="{% static 'js/site.js' %}"></script>
+<script type="module" src="{% static 'books/js/library.js' %}"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

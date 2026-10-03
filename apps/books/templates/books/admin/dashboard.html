@@ -1,0 +1,49 @@
+{% load static project_i18n %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#102f25">
+    <title>{% t "admin.page_title" %}</title>
+    <script type="module" src="{% static 'js/feather-lite.js' %}"></script>
+    <script type="module" src="{% static 'js/persian-ui.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/utilities.css' %}">
+    <link rel="stylesheet" href="{% static 'css/library.css' %}">
+    <link rel="stylesheet" href="{% static 'books/css/admin-dashboard.css' %}">
+</head>
+<body class="dashboard-page" data-admin-api-base="{% url 'api_admin_dashboard' %}" data-import-template-url="{% url 'api_admin_physical_import_template' %}" data-library-url="{% url 'index' %}" data-upload-page-url="{% url 'upload' %}" data-book-fallback="{% static 'images/book-placeholder.svg' %}" data-translations-url="{% url 'ui_translations' 'admin' %}">
+{% csrf_token %}
+<div class="admin-shell">
+    <aside id="sidebar" class="admin-sidebar">
+        <div class="admin-brand">
+            <span class="brand-mark" aria-hidden="true"><i data-feather="book-open"></i></span>
+            <div class="min-w-0"><strong>{% t "app.name" %}</strong><small>{% t "admin.menu.label" %} <span id="managementTotal" class="menu-count hidden">0</span></small></div>
+        </div>
+        <nav class="admin-nav" id="adminNav">
+            <button data-section="dashboard" class="active"><span><i data-feather="home"></i>{% t "admin.dashboard" %}</span></button>
+            <button data-section="books"><span><i data-feather="book-open"></i>{% t "admin.books" %}</span></button>
+            <button data-section="categories"><span><i data-feather="folder"></i>{% t "admin.categories" %}</span></button>
+            <button data-section="digital"><span><i data-feather="file-text"></i>{% t "admin.digital_requests" %}</span><b id="digitalCount" class="menu-count hidden">0</b></button>
+            <button data-section="physical"><span><i data-feather="book"></i>{% t "admin.physical_requests" %}</span><b id="physicalCount" class="menu-count hidden">0</b></button>
+            <button data-section="messages"><span><i data-feather="mail"></i>{% t "admin.messages" %}</span><b id="messageCount" class="menu-count hidden">0</b></button>
+            <button data-section="comments"><span><i data-feather="message-circle"></i>{% t "admin.comments" %}</span></button>
+            <button data-section="users"><span><i data-feather="users"></i>{% t "admin.users" %}</span></button>
+            <a href="{% url 'index' %}" target="_blank" rel="noopener"><span class="flex items-center gap-2"><i data-feather="external-link"></i>{% t "admin.view_library" %}</span></a>
+            <form method="post" action="{% url 'accounts:logout' %}" class="admin-logout">{% csrf_token %}<button type="submit"><span class="flex items-center gap-2"><i data-feather="log-out"></i>{% t "common.actions.logout" %}</span></button></form>
+        </nav>
+    </aside>
+    <button id="sidebarBackdrop" class="admin-sidebar-backdrop" type="button" aria-label="{% t 'admin.menu.close_aria' %}"></button>
+    <section class="admin-main">
+        <header class="admin-header">
+            <div class="admin-header-title flex items-center gap-3"><button id="mobileMenu" class="mobile-menu action-btn"><i data-feather="menu"></i></button><div><h1 id="pageTitle" class="font-black text-xl">{% t "admin.dashboard" %}</h1></div></div>
+            <div id="headerActions" class="admin-actions"></div>
+        </header>
+        <main id="content" class="admin-content"></main>
+    </section>
+</div>
+<div id="modal" class="modal-wrap"><div id="modalCard" class="modal-card"></div></div>
+<div id="notice" class="notice"></div>
+<script type="module" src="{% static 'books/js/admin-dashboard.js' %}"></script>
+</body>
+</html>

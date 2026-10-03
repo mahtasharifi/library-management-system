@@ -1,0 +1,55 @@
+{% extends "layouts/account.html" %}
+{% load project_i18n %}
+
+{% block title %}{% t "accounts.edit.page_title" %}{% endblock %}
+
+{% block content %}
+<section class="account-panel max-w-2xl" aria-labelledby="edit-profile-title">
+    <article class="account-card">
+        <header class="account-card-head">
+            <small>{% t "accounts.edit.kicker" %}</small>
+            <h1 id="edit-profile-title">{% t "accounts.edit.title" %}</h1>
+        </header>
+        <div class="account-card-content">
+            <form method="post" enctype="multipart/form-data" class="library-form" novalidate>
+                {% csrf_token %}
+                <div class="form-grid">
+                    <div class="field">
+                        <label for="id_first_name">{% t "common.labels.name" %}</label>
+                        {{ form.first_name }}
+                        {% if form.first_name.errors %}<p class="field-error">{{ form.first_name.errors|join:", " }}</p>{% endif %}
+                    </div>
+                    <div class="field">
+                        <label for="id_last_name">{% t "common.labels.last_name" %}</label>
+                        {{ form.last_name }}
+                        {% if form.last_name.errors %}<p class="field-error">{{ form.last_name.errors|join:", " }}</p>{% endif %}
+                    </div>
+                </div>
+                <div class="field">
+                    <label for="id_email">{% t "common.labels.email" %}</label>
+                    {{ form.email }}
+                    {% if form.email.errors %}<p class="field-error">{{ form.email.errors|join:", " }}</p>{% endif %}
+                </div>
+                <div class="field">
+                    <label for="id_phone_number">{% t "common.labels.phone" %}</label>
+                    {{ form.phone_number }}
+                    {% if form.phone_number.errors %}<p class="field-error">{{ form.phone_number.errors|join:", " }}</p>{% endif %}
+                </div>
+                <div class="field">
+                    <label for="id_avatar">{% t "accounts.edit.avatar" %}</label>
+                    {{ form.avatar }}
+                    {% if form.avatar.errors %}<p class="field-error">{{ form.avatar.errors|join:", " }}</p>{% endif %}
+                </div>
+                {% if form.non_field_errors %}<div class="form-alert">{{ form.non_field_errors }}</div>{% endif %}
+                <div class="flex flex-col sm:flex-row gap-3 pt-2">
+                    <button type="submit" class="btn-brand flex-1">
+                        <i data-feather="save" class="w-4 h-4"></i>
+                        {% t "accounts.edit.submit" %}
+                    </button>
+                    <a href="{% url 'accounts:profile' %}" class="btn-soft">{% t "common.actions.cancel" %}</a>
+                </div>
+            </form>
+        </div>
+    </article>
+</section>
+{% endblock %}

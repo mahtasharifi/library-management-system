@@ -1,0 +1,28 @@
+{% extends "layouts/library.html" %}
+{% load project_i18n %}
+
+{% block title %}{% t "books.home.page_title" %}{% endblock %}
+{% block page_name %}home{% endblock %}
+{% block nav_home %}active{% endblock %}
+
+{% block content %}
+<section class="home-minimal-hero">
+    <div class="site-container home-minimal-grid">
+        <div class="home-minimal-copy">
+            <h1>{% t "books.home.hero_title" %}</h1>
+            <p>{% t "books.home.hero_help" %}</p>
+            <form class="home-search" action="/library/books/" method="get" role="search">
+                <i data-feather="search"></i>
+                <input type="search" name="q" autocomplete="off" placeholder="{% t 'books.home.search_placeholder' %}">
+                <button type="submit">{% t "common.actions.search" %}</button>
+            </form>
+            <a href="{% url 'book_catalog' %}" class="home-all-books">{% t "books.home.all_books" %}<i data-feather="arrow-left"></i></a>
+        </div>
+        <div id="homeCoverPreview" class="home-cover-preview" aria-label="{% t 'books.home.preview_aria' %}">
+            <span></span><span></span><span></span>
+        </div>
+    </div>
+</section>
+
+
+{% endblock %}

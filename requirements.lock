@@ -1,0 +1,13 @@
+Django==5.2.17
+asgiref==3.12.1
+sqlparse==0.6.0
+mysqlclient==2.2.8
+openpyxl==3.1.5
+et-xmlfile==2.0.0
+Pillow==12.3.0
+cryptography==50.0.1
+cffi==2.1.1
+pycparser==3.0
+qrcode==8.2
+gunicorn==26.2.0
+packaging==26.3

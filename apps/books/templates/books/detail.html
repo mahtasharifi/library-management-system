@@ -1,0 +1,107 @@
+{% extends "layouts/library.html" %}
+{% load static project_i18n %}
+
+{% block title %}{% t "books.detail.page_title" title=book.title %}{% endblock %}
+{% block page_name %}book-detail{% endblock %}
+{% block nav_books %}active{% endblock %}
+
+{% block content %}
+<section class="book-detail-page site-container">
+    <nav class="book-detail-breadcrumb" aria-label="{% t 'books.detail.breadcrumb_aria' %}">
+        <a href="{% url 'book_catalog' %}">{% t "navigation.all_books" %}</a>
+        <i data-feather="chevron-left"></i>
+        <span>{{ book.title }}</span>
+    </nav>
+
+    <article class="book-detail-card">
+        <aside class="book-detail-cover">
+            {% if book.cover_url %}
+                <img src="{{ book.cover_url }}" alt="{% t 'books.detail.cover_alt' title=book.title %}">
+            {% else %}
+                <img src="{% static 'images/book-placeholder.svg' %}" alt="{% t 'books.detail.cover_missing_alt' title=book.title %}">
+            {% endif %}
+            <div>
+                {% if book.has_physical %}<span>{% t "books.detail.physical" %}</span>{% endif %}
+                {% if book.has_pdf %}<span>{% t "books.catalog.digital" %}</span>{% endif %}
+            </div>
+        </aside>
+
+        <div class="book-detail-content">
+            <span class="book-detail-category">{% t "books.detail.no_category" as no_category_label %}{{ book.display_category_name|default:no_category_label }}</span>
+            <h1>{{ book.title }}</h1>
+            <dl class="book-detail-meta">
+                {% t "common.unknown" as unknown_label %}<div><dt>{% t "common.labels.author" %}</dt><dd>{{ book.author|default:unknown_label }}</dd></div>
+                {% if book.translator %}<div><dt>{% t "common.labels.translator" %}</dt><dd>{{ book.translator }}</dd></div>{% endif %}
+                {% if book.publisher %}<div><dt>{% t "common.labels.publisher" %}</dt><dd>{{ book.publisher }}</dd></div>{% endif %}
+                {% if book.library %}<div><dt>{% t "navigation.library" %}</dt><dd>{{ book.library }}</dd></div>{% endif %}
+            </dl>
+
+            <div class="book-availability {{ availability_class }}">
+                <i data-feather="{% if availability_class == 'available' %}check-circle{% elif availability_class == 'borrowed' %}clock{% else %}info{% endif %}"></i>
+                <div><strong>{% t "books.detail.access_status" %}</strong><span>{{ availability_label }}</span></div>
+            </div>
+
+            <div id="ratingOverallCompact" class="book-rating-overall{% if average_rating is None %} hidden{% endif %}" aria-label="{% t 'books.detail.rating_overall_aria' %}">
+                <span class="book-rating-overall-star" aria-hidden="true">★</span>
+                <strong id="ratingAverage">{% t "books.detail.rating_from_five" value=average_rating|default_if_none:""|floatformat:1 %}</strong>
+                <small id="ratingCount">{% t "books.detail.rating_count" count=rating_count %}</small>
+            </div>
+
+            <section class="book-detail-summary">
+                <h2>{% t "books.detail.about" %}</h2>
+                <p>{% t "books.detail.no_summary" as no_summary %}{{ book.summary|default:no_summary|linebreaksbr }}</p>
+            </section>
+
+            {% if book.has_physical or book.has_pdf %}
+                <div class="book-detail-actions">
+                    {% if book.has_physical %}
+                        <button type="button" data-request-physical="{{ book.id }}"><i data-feather="book"></i>{% if book.physical_available > 0 %}{% t "books.detail.request_borrow" %}{% else %}{% t "books.detail.notify_availability" %}{% endif %}</button>
+                    {% endif %}
+                    {% if book.has_pdf %}
+                        <button type="button" data-request-pdf="{{ book.id }}"><i data-feather="file-text"></i>{% t "accounts.profile.pdf_request" %}</button>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </article>
+
+    <section class="book-comments-section">
+        <header><span>{% t "books.detail.reader_comments" %}</span><h2>{% t "books.detail.comments" %}</h2></header>
+        <div id="bookComments">
+            {% for comment in comments %}
+                <article class="library-comment">
+                    <div><span>{{ comment.name|slice:':1' }}</span><strong>{{ comment.name }}</strong><time>{{ comment.created_at|date:'Y/m/d' }}</time></div>
+                    <p>{{ comment.comment }}</p>
+                    {% if comment.replies.all %}
+                        <section>
+                            {% for reply in comment.replies.all %}
+                                <div class="library-admin-reply"><i data-feather="corner-down-left"></i><div><strong>{{ reply.name }}</strong><p>{{ reply.comment }}</p></div></div>
+                            {% endfor %}
+                        </section>
+                    {% endif %}
+                </article>
+            {% empty %}
+                <div class="library-comments-empty">{% t "books.detail.no_comments" %}</div>
+            {% endfor %}
+        </div>
+        <form id="commentForm" class="library-comment-form">
+            <div id="bookRatingForm" class="comment-rating" data-rating-book-id="{{ book.id }}" aria-label="{% t 'books.detail.your_rating' %}">
+                <span class="comment-rating-label">{% t "books.detail.your_rating" %}</span>
+                <div class="book-rating-stars comment-rating-stars" role="group" aria-label="{% t 'books.detail.rating_group_aria' %}">
+                    <button type="button" data-rate="1" class="{% if user_rating >= 1 %}is-filled{% endif %}" aria-pressed="{% if user_rating == 1 %}true{% else %}false{% endif %}" aria-label="{% t 'books.detail.star_aria' value=1 %}"><span aria-hidden="true">★</span></button>
+                    <button type="button" data-rate="2" class="{% if user_rating >= 2 %}is-filled{% endif %}" aria-pressed="{% if user_rating == 2 %}true{% else %}false{% endif %}" aria-label="{% t 'books.detail.star_aria' value=2 %}"><span aria-hidden="true">★</span></button>
+                    <button type="button" data-rate="3" class="{% if user_rating >= 3 %}is-filled{% endif %}" aria-pressed="{% if user_rating == 3 %}true{% else %}false{% endif %}" aria-label="{% t 'books.detail.star_aria' value=3 %}"><span aria-hidden="true">★</span></button>
+                    <button type="button" data-rate="4" class="{% if user_rating >= 4 %}is-filled{% endif %}" aria-pressed="{% if user_rating == 4 %}true{% else %}false{% endif %}" aria-label="{% t 'books.detail.star_aria' value=4 %}"><span aria-hidden="true">★</span></button>
+                    <button type="button" data-rate="5" class="{% if user_rating >= 5 %}is-filled{% endif %}" aria-pressed="{% if user_rating == 5 %}true{% else %}false{% endif %}" aria-label="{% t 'books.detail.star_aria' value=5 %}"><span aria-hidden="true">★</span></button>
+                </div>
+                <small id="userRatingText">{% if user_rating %}{% t "books.detail.your_rating_value" value=user_rating %}{% endif %}</small>
+            </div>
+            <textarea name="text" required rows="3" placeholder="{% t 'books.detail.comment_placeholder' %}"></textarea>
+            <label class="library-comment-email"><span>{% t "books.detail.email_response" %}</span><input name="email" type="email" dir="ltr" required value="{{ request.user.email }}"></label>
+            <button type="submit"><i data-feather="send"></i>{% t "books.detail.submit_comment" %}</button>
+        </form>
+    </section>
+</section>
+
+{{ detail_book_data|json_script:"detailBookData" }}
+{% endblock %}
